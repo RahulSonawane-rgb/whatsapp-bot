@@ -29,8 +29,13 @@ const whatsapp = new Client({
     }
 });
 
+// Start the server on port 3000
+const express = require('express')
+const server = express()
+const PORT = process.env.PORT || 4000;
+
 // Create a simple HTTP server to serve the QR code
-const server = http.createServer((req, res) => {
+server.get('/', (req, res) => {
     if (req.url === '/') {
         const filePath = path.join(__dirname, 'qrcode.html');
         fs.readFile(filePath, (err, data) => {
@@ -48,10 +53,8 @@ const server = http.createServer((req, res) => {
     }
 });
 
-// Start the server on port 3000
-const PORT = 3000;
 server.listen(PORT, () => {
-    console.log(`Server running at http://localhost:${PORT}/`);
+    console.log(`Example app listening on port ${port}`)
 });
 
 whatsapp.on('qr', async (qr) => {
