@@ -48,10 +48,10 @@ const server = http.createServer((req, res) => {
     }
 });
 
-// Start the server on port 3000
-const PORT = 3000;
+// Start the server on port assigned by Render or fallback to 3000
+const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
-    console.log(`Server running at http://localhost:${PORT}/`);
+    console.log(`Server running on Render at ${process.env.RENDER_EXTERNAL_URL || `http://localhost:${PORT}`}/`);
 });
 
 whatsapp.on('qr', async (qr) => {
@@ -85,7 +85,7 @@ whatsapp.on('qr', async (qr) => {
         
         // Save the HTML content to a file
         fs.writeFileSync(path.join(__dirname, 'qrcode.html'), htmlContent);
-        console.log('QR code generated at http://localhost:3000/');
+        console.log(`QR code generated at ${process.env.RENDER_EXTERNAL_URL || `http://localhost:${PORT}`}/`);
     } catch (error) {
         console.error('Error generating QR code:', error);
     }
