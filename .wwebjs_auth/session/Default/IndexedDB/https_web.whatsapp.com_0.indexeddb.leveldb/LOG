@@ -1,13 +1,14 @@
-2025/06/02-20:09:21.982 5298 Reusing MANIFEST D:\PROJECT\whatsapp-bot\.wwebjs_auth\session\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/MANIFEST-000001
-2025/06/02-20:09:21.982 5298 Recovering log #49
-2025/06/02-20:09:22.001 5298 Reusing old log D:\PROJECT\whatsapp-bot\.wwebjs_auth\session\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/000049.log 
-2025/06/02-20:09:24.347 5298 Level-0 table #54: started
-2025/06/02-20:09:24.350 5298 Level-0 table #54: 110448 bytes OK
-2025/06/02-20:09:24.351 5298 Delete type=0 #49
-2025/06/02-20:09:24.351 5298 Manual compaction at level-0 from '\x00\x1a\x00\x00\x00' @ 72057594037927935 : 1 .. '\x00\x1b\x00\x00\x00' @ 0 : 0; will stop at (end)
-2025/06/02-20:09:25.877 5298 Compacting 1@1 + 1@2 files
-2025/06/02-20:09:25.928 5298 Generated table #55@1: 37076 keys, 2077383 bytes
-2025/06/02-20:09:25.928 5298 Compacted 1@1 + 1@2 files => 2077383 bytes
-2025/06/02-20:09:25.929 5298 compacted to: files[ 0 0 1 0 0 0 0 ]
-2025/06/02-20:09:25.929 5298 Delete type=2 #51
-2025/06/02-20:09:25.929 5298 Delete type=2 #54
+2025/06/02-20:48:54.997 e7c Reusing MANIFEST D:\PROJECT\Whatsapp-Bot\.wwebjs_auth\session\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/MANIFEST-000001
+2025/06/02-20:48:54.997 e7c Recovering log #53
+2025/06/02-20:48:55.019 e7c Reusing old log D:\PROJECT\Whatsapp-Bot\.wwebjs_auth\session\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/000053.log 
+2025/06/02-20:49:02.834 e7c Level-0 table #58: started
+2025/06/02-20:49:02.846 e7c Level-0 table #58: 488412 bytes OK
+2025/06/02-20:49:02.848 e7c Delete type=0 #53
+2025/06/02-20:49:02.848 e7c Manual compaction at level-0 from '\x00\x1b\x00\x00\x00' @ 72057594037927935 : 1 .. '\x00\x1c\x00\x00\x00' @ 0 : 0; will stop at (end)
+2025/06/02-20:49:04.942 380c Compacting 1@1 + 1@2 files
+2025/06/02-20:49:05.012 380c Generated table #59@1: 39560 keys, 2200256 bytes
+2025/06/02-20:49:05.016 380c Generated table #60@1: 1168 keys, 22819 bytes
+2025/06/02-20:49:05.016 380c Compacted 1@1 + 1@2 files => 2223075 bytes
+2025/06/02-20:49:05.017 380c compacted to: files[ 0 0 2 0 0 0 0 ]
+2025/06/02-20:49:05.017 380c Delete type=2 #55
+2025/06/02-20:49:05.017 380c Delete type=2 #58

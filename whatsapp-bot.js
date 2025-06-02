@@ -17,7 +17,7 @@ const reasonTimeouts = new Map(); // Track timeouts per user
 const whatsapp = new Client({
     authStrategy: new LocalAuth(),
     puppeteer: {
-        headless: true,
+        headless: false,
         args: [
             '--no-sandbox',
             '--disable-setuid-sandbox',
