@@ -1,5 +1,7 @@
-const QRCode = require('qrcode');
-const { Client, LocalAuth, MessageMedia } = require('whatsapp-web.js');
+const qrcode = require('qrcode');
+const { Client, LocalAuth } = require('whatsapp-web.js');
+const express = require('express');
+const app = express();
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
@@ -17,81 +19,35 @@ const reasonTimeouts = new Map(); // Track timeouts per user
 const whatsapp = new Client({
     authStrategy: new LocalAuth(),
     puppeteer: {
-        headless: false,
+        headless: true, // Ensure headless mode
+        executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || '/usr/bin/chromium',
         args: [
-            '--no-sandbox',
+            '--no-sandbox', // Required for Render
             '--disable-setuid-sandbox',
             '--disable-dev-shm-usage',
             '--disable-accelerated-2d-canvas',
-            '--disable-gpu',
-            '--window-size=1920,1080',
+            '--disable-gpu', // Disable GPU to avoid graphical dependencies
+            '--no-zygote', // Improve stability in containers
+            '--single-process', // Reduce resource usage
+            '--disable-features=TranslateUI', // Disable unnecessary features
+            '--no-first-run',
+            '--disable-extensions',
         ],
     }
 });
 
-// Create a simple HTTP server to serve the QR code
-const server = http.createServer((req, res) => {
-    if (req.url === '/') {
-        const filePath = path.join(__dirname, 'qrcode.html');
-        fs.readFile(filePath, (err, data) => {
-            if (err) {
-                res.writeHead(500, { 'Content-Type': 'text/plain' });
-                res.end('Error loading QR code page');
-                return;
-            }
-            res.writeHead(200, { 'Content-Type': 'text/html' });
-            res.end(data);
-        });
-    } else {
-        res.writeHead(404, { 'Content-Type': 'text/plain' });
-        res.end('Not found');
-    }
-});
-
-// Start the server on port 3000
-const PORT = 3000;
-server.listen(PORT, () => {
-});
-
 whatsapp.on('qr', async (qr) => {
-    try {
-        // Generate QR code as a data URL
-        const qrDataUrl = await QRCode.toDataURL(qr);
-        
-        // Create HTML content with the QR code
-        const htmlContent = `
-            <!DOCTYPE html>
-            <html lang="en">
-            <head>
-                <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>WhatsApp QR Code</title>
-                <style>
-                    body { display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background-color: #f0f0f0; }
-                    .container { text-align: center; }
-                    h1 { font-family: Arial, sans-serif; color: #333; }
-                    img { border: 5px solid #fff; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-                </style>
-            </head>
-            <body>
-                <div class="container">
-                    <h1>Scan the QR Code to Log In to WhatsApp</h1>
-                    <img src="${qrDataUrl}" alt="WhatsApp QR Code">
-                </div>
-            </body>
-            </html>
-        `;
-        
-        // Save the HTML content to a file
-        fs.writeFileSync(path.join(__dirname, 'qrcode.html'), htmlContent);
-        console.log('QR code generated at http://localhost:3000/');
-    } catch (error) {
-        console.error('Error generating QR code:', error);
-    }
+    console.log('QR code generated');
+    const qrImage = await qrcode.toDataURL(qr);
+    app.get('/', (req, res) => res.send(`<img src="${qrImage}" />`));
 });
 
 whatsapp.on('ready', () => {
     console.log('WhatsApp bot is ready!');
+});
+
+whatsapp.on('auth_failure', (msg) => {
+    console.error('Authentication failure:', msg);
 });
 
 whatsapp.on('message', async (message) => {
@@ -288,3 +244,5 @@ whatsapp.on('message', async (message) => {
 whatsapp.initialize().catch((error) => {
     console.error('Failed to initialize WhatsApp:', error);
 });
+
+app.listen(3000, '0.0.0.0', () => console.log('Server running on port 3000'));
