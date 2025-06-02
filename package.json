@@ -17,6 +17,6 @@
     }
   },
   "scripts": {
-    "start": "node index.js"
+    "start": "node whatsapp-bot.js"
   }
 }
