@@ -28,7 +28,10 @@ RUN apt-get update && apt-get install -y \
     --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
-# Set Puppeteer to skip downloading Chromium (use system Chromium)
+# Set DNS to Google to avoid resolution issues
+RUN echo "nameserver 8.8.8.8" > /etc/resolv.conf
+
+# Set Puppeteer to skip downloading Chromium
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
     PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
 
@@ -39,7 +42,7 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 
 # Install dependencies
-RUN npm install
+RUN npm install -y
 
 # Copy application code
 COPY . .

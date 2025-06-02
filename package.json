@@ -4,15 +4,15 @@
   "dependencies": {
     "dotenv": "^16.5.0",
     "express": "^4.21.1",
-    "puppeteer": "^24.9.0",
-    "qrcode": "^1.5.3",
+    "puppeteer-core": "^24.9.0",
+    "qrcode": "^1.5.4",
     "qrcode-terminal": "^0.12.0",
     "redis": "^4.6.0",
     "whatsapp-web.js": "^1.30.0"
   },
   "overrides": {
     "whatsapp-web.js": {
-      "puppeteer": "^24.9.0"
+      "puppeteer-core": "^24.9.0"
     }
   },
   "scripts": {
