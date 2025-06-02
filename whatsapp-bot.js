@@ -1,70 +1,10 @@
 const QRCode = require('qrcode');
-const { Client, MessageMedia } = require('whatsapp-web.js');
-const { createClient } = require('redis');
+const { Client, LocalAuth, MessageMedia } = require('whatsapp-web.js');
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
 
-// Custom Redis Auth Strategy for whatsapp-web.js
-class RedisAuthStrategy {
-    constructor({ client, redisClient }) {
-        this.client = client;
-        this.redisClient = redisClient;
-    }
-
-    async setup(client) {
-        this.client = client; // Bind client instance
-        console.log('RedisAuthStrategy setup complete');
-    }
-
-    async beforeAll() {
-        try {
-            await this.redisClient.connect();
-            console.log('Redis client connected');
-        } catch (error) {
-            console.error('Failed to connect to Redis:', error);
-        }
-    }
-
-    async afterAll() {
-        try {
-            await this.redisClient.quit();
-            console.log('Redis client disconnected');
-        } catch (error) {
-            console.error('Failed to disconnect Redis:', error);
-        }
-    }
-
-    async logout() {
-        try {
-            await this.redisClient.del(`session:${this.client.options.puppeteer.sessionId}`);
-            console.log('Session cleared from Redis');
-        } catch (error) {
-            console.error('Failed to clear session from Redis:', error);
-        }
-    }
-
-    async getAuth() {
-        try {
-            const sessionData = await this.redisClient.get(`session:${this.client.options.puppeteer.sessionId}`);
-            return sessionData ? JSON.parse(sessionData) : null;
-        } catch (error) {
-            console.error('Failed to get session from Redis:', error);
-            return null;
-        }
-    }
-
-    async saveAuth(authData) {
-        try {
-            await this.redisClient.set(`session:${this.client.options.puppeteer.sessionId}`, JSON.stringify(authData));
-            console.log('Session saved to Redis');
-        } catch (error) {
-            console.error('Failed to save session to Redis:', error);
-        }
-    }
-}
-
-const OWNER_NUMBER = process.env.OWNER_NUMBER || '91999999900@c.us';
+const OWNER_NUMBER = '919090909080@c.us'; // Replace with actual owner's WhatsApp number
 const SUPPORTED_DOCUMENT_TYPES = ['application/pdf', 'image/jpeg', 'image/png', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
 const MAX_DOCUMENT_SIZE = 10 * 1024 * 1024; // 10 MB
 const MAX_PENDING_DOCUMENTS = 10; // Max 10 documents queued per user
@@ -74,17 +14,8 @@ const REASON_TIMEOUT = 10 * 1000; // 10 seconds timeout for reason prompt
 const messageContext = new Map();
 const reasonTimeouts = new Map(); // Track timeouts per user
 
-// Initialize Redis client
-const redisClient = createClient({
-    url: process.env.REDIS_URL || 'redis://localhost:6379' // Replace with Render Key Value endpoint
-});
-
-// Configure WhatsApp client with Redis auth strategy
 const whatsapp = new Client({
-    authStrategy: new RedisAuthStrategy({
-        client: null, // Will be set in setup
-        redisClient
-    }),
+    authStrategy: new LocalAuth(),
     puppeteer: {
         headless: true,
         args: [
@@ -95,7 +26,6 @@ const whatsapp = new Client({
             '--disable-gpu',
             '--window-size=1920,1080',
         ],
-        sessionId: 'whatsapp-bot-session' // Unique session ID
     }
 });
 
@@ -118,10 +48,9 @@ const server = http.createServer((req, res) => {
     }
 });
 
-// Start the server on port assigned by Render or fallback to 3000
-const PORT = process.env.PORT || 3000;
+// Start the server on port 3000
+const PORT = 3000;
 server.listen(PORT, () => {
-    console.log(`Server running on Render at ${process.env.RENDER_EXTERNAL_URL || `http://localhost:${PORT}`}/`);
 });
 
 whatsapp.on('qr', async (qr) => {
@@ -155,7 +84,7 @@ whatsapp.on('qr', async (qr) => {
         
         // Save the HTML content to a file
         fs.writeFileSync(path.join(__dirname, 'qrcode.html'), htmlContent);
-        console.log(`QR code generated at ${process.env.RENDER_EXTERNAL_URL || `http://localhost:${PORT}`}/`);
+        console.log('QR code generated at http://localhost:3000/');
     } catch (error) {
         console.error('Error generating QR code:', error);
     }
@@ -165,15 +94,6 @@ whatsapp.on('ready', () => {
     console.log('WhatsApp bot is ready!');
 });
 
-whatsapp.on('authenticated', () => {
-    console.log('Authenticated successfully, session saved to Redis');
-});
-
-whatsapp.on('auth_failure', (msg) => {
-    console.error('Authentication failed:', msg);
-});
-
-// Message handling
 whatsapp.on('message', async (message) => {
     let chat;
     try {
