@@ -4,7 +4,7 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 
-const OWNER_NUMBER = '919090909080@c.us'; // Replace with actual owner's WhatsApp number
+const OWNER_NUMBER = '918080032223@c.us'; // Replace with actual owner's WhatsApp number
 const SUPPORTED_DOCUMENT_TYPES = ['application/pdf', 'image/jpeg', 'image/png', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
 const MAX_DOCUMENT_SIZE = 10 * 1024 * 1024; // 10 MB
 const MAX_PENDING_DOCUMENTS = 10; // Max 10 documents queued per user
