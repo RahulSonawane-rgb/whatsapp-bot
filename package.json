@@ -11,5 +11,8 @@
     "whatsapp-web.js": {
       "puppeteer": "^24.9.0"
     }
+  },
+  "scripts": {
+    "start": "node index.js"
   }
 }
