@@ -1,10 +1,43 @@
 const QRCode = require('qrcode');
-const { Client, LocalAuth, MessageMedia } = require('whatsapp-web.js');
+const { Client, MessageMedia } = require('whatsapp-web.js');
+const { createClient } = require('redis');
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
 
-const OWNER_NUMBER = '91999999900@c.us'; // Replace with actual owner's WhatsApp number
+// Custom Redis Auth Strategy for whatsapp-web.js
+class RedisAuthStrategy {
+    constructor(redisClient) {
+        this.redisClient = redisClient;
+    }
+
+    async beforeAll() {
+        await this.redisClient.connect();
+        console.log('Redis client connected');
+    }
+
+    async afterAll() {
+        await this.redisClient.quit();
+        console.log('Redis client disconnected');
+    }
+
+    async logout(client) {
+        await this.redisClient.del(`session:${client.options.puppeteer.sessionId}`);
+        console.log('Session cleared from Redis');
+    }
+
+    async getAuth(client) {
+        const sessionData = await this.redisClient.get(`session:${client.options.puppeteer.sessionId}`);
+        return sessionData ? JSON.parse(sessionData) : null;
+    }
+
+    async saveAuth(client, authData) {
+        await this.redisClient.set(`session:${client.options.puppeteer.sessionId}`, JSON.stringify(authData));
+        console.log('Session saved to Redis');
+    }
+}
+
+const OWNER_NUMBER = process.env.OWNER_NUMBER || '91999999900@c.us';
 const SUPPORTED_DOCUMENT_TYPES = ['application/pdf', 'image/jpeg', 'image/png', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
 const MAX_DOCUMENT_SIZE = 10 * 1024 * 1024; // 10 MB
 const MAX_PENDING_DOCUMENTS = 10; // Max 10 documents queued per user
@@ -14,8 +47,14 @@ const REASON_TIMEOUT = 10 * 1000; // 10 seconds timeout for reason prompt
 const messageContext = new Map();
 const reasonTimeouts = new Map(); // Track timeouts per user
 
+// Initialize Redis client
+const redisClient = createClient({
+    url: process.env.REDIS_URL || 'redis://localhost:6379' // Replace with Render Key Value endpoint
+});
+
+// Configure WhatsApp client with Redis auth strategy
 const whatsapp = new Client({
-    authStrategy: new LocalAuth(),
+    authStrategy: new RedisAuthStrategy(redisClient),
     puppeteer: {
         headless: true,
         args: [
@@ -26,6 +65,7 @@ const whatsapp = new Client({
             '--disable-gpu',
             '--window-size=1920,1080',
         ],
+        sessionId: 'whatsapp-bot-session' // Unique session ID
     }
 });
 
@@ -95,6 +135,15 @@ whatsapp.on('ready', () => {
     console.log('WhatsApp bot is ready!');
 });
 
+whatsapp.on('authenticated', () => {
+    console.log('Authenticated successfully, session saved to Redis');
+});
+
+whatsapp.on('auth_failure', (msg) => {
+    console.error('Authentication failed:', msg);
+});
+
+// ... (rest of your message handling code remains unchanged)
 whatsapp.on('message', async (message) => {
     let chat;
     try {
