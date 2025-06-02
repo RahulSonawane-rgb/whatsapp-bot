@@ -7,33 +7,60 @@ const path = require('path');
 
 // Custom Redis Auth Strategy for whatsapp-web.js
 class RedisAuthStrategy {
-    constructor(redisClient) {
+    constructor({ client, redisClient }) {
+        this.client = client;
         this.redisClient = redisClient;
     }
 
+    async setup(client) {
+        this.client = client; // Bind client instance
+        console.log('RedisAuthStrategy setup complete');
+    }
+
     async beforeAll() {
-        await this.redisClient.connect();
-        console.log('Redis client connected');
+        try {
+            await this.redisClient.connect();
+            console.log('Redis client connected');
+        } catch (error) {
+            console.error('Failed to connect to Redis:', error);
+        }
     }
 
     async afterAll() {
-        await this.redisClient.quit();
-        console.log('Redis client disconnected');
+        try {
+            await this.redisClient.quit();
+            console.log('Redis client disconnected');
+        } catch (error) {
+            console.error('Failed to disconnect Redis:', error);
+        }
     }
 
-    async logout(client) {
-        await this.redisClient.del(`session:${client.options.puppeteer.sessionId}`);
-        console.log('Session cleared from Redis');
+    async logout() {
+        try {
+            await this.redisClient.del(`session:${this.client.options.puppeteer.sessionId}`);
+            console.log('Session cleared from Redis');
+        } catch (error) {
+            console.error('Failed to clear session from Redis:', error);
+        }
     }
 
-    async getAuth(client) {
-        const sessionData = await this.redisClient.get(`session:${client.options.puppeteer.sessionId}`);
-        return sessionData ? JSON.parse(sessionData) : null;
+    async getAuth() {
+        try {
+            const sessionData = await this.redisClient.get(`session:${this.client.options.puppeteer.sessionId}`);
+            return sessionData ? JSON.parse(sessionData) : null;
+        } catch (error) {
+            console.error('Failed to get session from Redis:', error);
+            return null;
+        }
     }
 
-    async saveAuth(client, authData) {
-        await this.redisClient.set(`session:${client.options.puppeteer.sessionId}`, JSON.stringify(authData));
-        console.log('Session saved to Redis');
+    async saveAuth(authData) {
+        try {
+            await this.redisClient.set(`session:${this.client.options.puppeteer.sessionId}`, JSON.stringify(authData));
+            console.log('Session saved to Redis');
+        } catch (error) {
+            console.error('Failed to save session to Redis:', error);
+        }
     }
 }
 
@@ -54,7 +81,10 @@ const redisClient = createClient({
 
 // Configure WhatsApp client with Redis auth strategy
 const whatsapp = new Client({
-    authStrategy: new RedisAuthStrategy(redisClient),
+    authStrategy: new RedisAuthStrategy({
+        client: null, // Will be set in setup
+        redisClient
+    }),
     puppeteer: {
         headless: true,
         args: [
@@ -143,7 +173,7 @@ whatsapp.on('auth_failure', (msg) => {
     console.error('Authentication failed:', msg);
 });
 
-// ... (rest of your message handling code remains unchanged)
+// Message handling
 whatsapp.on('message', async (message) => {
     let chat;
     try {

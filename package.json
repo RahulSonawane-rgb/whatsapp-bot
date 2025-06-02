@@ -6,9 +6,9 @@
     "start": "node whatsapp-bot.js"
   },
   "dependencies": {
-    "puppeteer": "^23.0.0",
+    "whatsapp-web.js": "^1.23.0",
     "qrcode": "^1.5.3",
-    "redis": "^4.7.1",
-    "whatsapp-web.js": "^1.23.0"
+    "puppeteer": "^23.0.0",
+    "redis": "^4.6.0"
   }
 }
