@@ -1,15 +1,13 @@
-2025/06/02-20:06:02.937 c3c Reusing MANIFEST D:\PROJECT\whatsapp-bot\.wwebjs_auth\session\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/MANIFEST-000001
-2025/06/02-20:06:02.937 c3c Recovering log #45
-2025/06/02-20:06:03.016 c3c Reusing old log D:\PROJECT\whatsapp-bot\.wwebjs_auth\session\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/000045.log 
-2025/06/02-20:06:03.016 c3c Delete type=2 #44
-2025/06/02-20:06:03.016 c3c Delete type=2 #46
-2025/06/02-20:06:04.748 c3c Level-0 table #50: started
-2025/06/02-20:06:04.754 c3c Level-0 table #50: 306985 bytes OK
-2025/06/02-20:06:04.755 c3c Delete type=0 #45
-2025/06/02-20:06:04.755 c3c Manual compaction at level-0 from '\x00\x19\x00\x00\x00' @ 72057594037927935 : 1 .. '\x00\x1a\x00\x00\x00' @ 0 : 0; will stop at (end)
-2025/06/02-20:06:06.299 d3c Compacting 1@1 + 1@2 files
-2025/06/02-20:06:06.354 d3c Generated table #51@1: 35806 keys, 2038391 bytes
-2025/06/02-20:06:06.354 d3c Compacted 1@1 + 1@2 files => 2038391 bytes
-2025/06/02-20:06:06.355 d3c compacted to: files[ 0 0 1 0 0 0 0 ]
-2025/06/02-20:06:06.355 d3c Delete type=2 #47
-2025/06/02-20:06:06.355 d3c Delete type=2 #50
+2025/06/02-20:09:21.982 5298 Reusing MANIFEST D:\PROJECT\whatsapp-bot\.wwebjs_auth\session\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/MANIFEST-000001
+2025/06/02-20:09:21.982 5298 Recovering log #49
+2025/06/02-20:09:22.001 5298 Reusing old log D:\PROJECT\whatsapp-bot\.wwebjs_auth\session\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/000049.log 
+2025/06/02-20:09:24.347 5298 Level-0 table #54: started
+2025/06/02-20:09:24.350 5298 Level-0 table #54: 110448 bytes OK
+2025/06/02-20:09:24.351 5298 Delete type=0 #49
+2025/06/02-20:09:24.351 5298 Manual compaction at level-0 from '\x00\x1a\x00\x00\x00' @ 72057594037927935 : 1 .. '\x00\x1b\x00\x00\x00' @ 0 : 0; will stop at (end)
+2025/06/02-20:09:25.877 5298 Compacting 1@1 + 1@2 files
+2025/06/02-20:09:25.928 5298 Generated table #55@1: 37076 keys, 2077383 bytes
+2025/06/02-20:09:25.928 5298 Compacted 1@1 + 1@2 files => 2077383 bytes
+2025/06/02-20:09:25.929 5298 compacted to: files[ 0 0 1 0 0 0 0 ]
+2025/06/02-20:09:25.929 5298 Delete type=2 #51
+2025/06/02-20:09:25.929 5298 Delete type=2 #54
