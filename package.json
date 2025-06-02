@@ -3,9 +3,13 @@
   "version": "1.0.0",
   "dependencies": {
     "dotenv": "^16.5.0",
+    "fs": "^0.0.1-security",
+    "http": "^0.0.1-security",
+    "path": "^0.12.7",
     "puppeteer": "^24.9.0",
+    "qrcode": "^1.5.4",
     "qrcode-terminal": "^0.12.0",
-    "whatsapp-web.js": "^1.29.0"
+    "whatsapp-web.js": "^1.30.0"
   },
   "overrides": {
     "whatsapp-web.js": {

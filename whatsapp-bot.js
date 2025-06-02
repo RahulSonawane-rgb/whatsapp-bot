@@ -1,7 +1,10 @@
-const qrcode = require('qrcode-terminal');
+const QRCode = require('qrcode');
 const { Client, LocalAuth, MessageMedia } = require('whatsapp-web.js');
+const http = require('http');
+const fs = require('fs');
+const path = require('path');
 
-const OWNER_NUMBER = '9999999990@c.us'; // Replace with actual owner's WhatsApp number
+const OWNER_NUMBER = '91999999900@c.us'; // Replace with actual owner's WhatsApp number
 const SUPPORTED_DOCUMENT_TYPES = ['application/pdf', 'image/jpeg', 'image/png', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
 const MAX_DOCUMENT_SIZE = 10 * 1024 * 1024; // 10 MB
 const MAX_PENDING_DOCUMENTS = 10; // Max 10 documents queued per user
@@ -26,9 +29,66 @@ const whatsapp = new Client({
     }
 });
 
-whatsapp.on('qr', (qr) => {
-    console.log('Scan the QR code below:');
-    qrcode.generate(qr, { small: true });
+// Create a simple HTTP server to serve the QR code
+const server = http.createServer((req, res) => {
+    if (req.url === '/') {
+        const filePath = path.join(__dirname, 'qrcode.html');
+        fs.readFile(filePath, (err, data) => {
+            if (err) {
+                res.writeHead(500, { 'Content-Type': 'text/plain' });
+                res.end('Error loading QR code page');
+                return;
+            }
+            res.writeHead(200, { 'Content-Type': 'text/html' });
+            res.end(data);
+        });
+    } else {
+        res.writeHead(404, { 'Content-Type': 'text/plain' });
+        res.end('Not found');
+    }
+});
+
+// Start the server on port 3000
+const PORT = 3000;
+server.listen(PORT, () => {
+    console.log(`Server running at http://localhost:${PORT}/`);
+});
+
+whatsapp.on('qr', async (qr) => {
+    try {
+        // Generate QR code as a data URL
+        const qrDataUrl = await QRCode.toDataURL(qr);
+        
+        // Create HTML content with the QR code
+        const htmlContent = `
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>WhatsApp QR Code</title>
+                <style>
+                    body { display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background-color: #f0f0f0; }
+                    .container { text-align: center; }
+                    h1 { font-family: Arial, sans-serif; color: #333; }
+                    img { border: 5px solid #fff; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <h1>Scan the QR Code to Log In to WhatsApp</h1>
+                    <img src="${qrDataUrl}" alt="WhatsApp QR Code">
+                </div>
+            </body>
+            </html>
+        `;
+        
+        // Save the HTML content to a file
+        fs.writeFileSync(path.join(__dirname, 'qrcode.html'), htmlContent);
+        console.log('QR code generated at http://localhost:3000/');
+    } catch (error) {
+        console.error('Error generating QR code:', error);
+    }
 });
 
 whatsapp.on('ready', () => {
