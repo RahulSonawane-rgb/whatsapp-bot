@@ -1,6 +1,14 @@
 const { Client, LocalAuth } = require('whatsapp-web.js');
-const qrcode = require('qrcode-terminal');
+const express = require('express');
+const qrImage = require('qr-image');
+const fs = require('fs');
+const path = require('path');
 
+const app = express();
+const port = process.env.PORT || 3000;
+const qrFilePath = path.join(__dirname, 'qr.png');
+
+// Initialize WhatsApp client
 const client = new Client({
     authStrategy: new LocalAuth(),
     puppeteer: {
@@ -9,15 +17,37 @@ const client = new Client({
     }
 });
 
+// Generate and save QR code as an image
 client.on('qr', qr => {
-    console.log('QR code received, scan it with your WhatsApp app:');
-    qrcode.generate(qr, { small: true });
+    console.log('QR code generated. Access it at http://<your-render-url>/qr');
+    const qrPng = qrImage.image(qr, { type: 'png' });
+    qrPng.pipe(fs.createWriteStream(qrFilePath));
 });
 
+// Serve QR code image
+app.get('/qr', (req, res) => {
+    if (fs.existsSync(qrFilePath)) {
+        res.sendFile(qrFilePath);
+    } else {
+        res.status(404).send('QR code not generated yet. Please wait or redeploy.');
+    }
+});
+
+// Serve a basic homepage
+app.get('/', (req, res) => {
+    res.send('WhatsApp bot is running. Access the QR code at /qr');
+});
+
+// WhatsApp client ready
 client.on('ready', () => {
     console.log('WhatsApp bot is ready!');
+    // Optionally delete QR code after successful authentication
+    if (fs.existsSync(qrFilePath)) {
+        fs.unlinkSync(qrFilePath);
+    }
 });
 
+// Handle incoming messages
 client.on('message', async message => {
     const text = message.body.toLowerCase();
     if (text === 'hello') {
@@ -25,10 +55,17 @@ client.on('message', async message => {
     }
 });
 
+// Start Express server
+app.listen(port, () => {
+    console.log(`Server running on port ${port}`);
+});
+
+// Initialize WhatsApp client
 client.initialize().catch(err => {
     console.error('Failed to initialize WhatsApp client:', err);
 });
 
+// Handle graceful shutdown
 process.on('SIGINT', async () => {
     console.log('Shutting down WhatsApp bot...');
     await client.destroy();

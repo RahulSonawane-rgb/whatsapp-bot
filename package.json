@@ -1,17 +1,14 @@
 {
-  "name": "whatsapp-test",
+  "name": "whatsapp-bot",
   "version": "1.0.0",
-  "description": "A simple WhatsApp bot",
+  "description": "A simple WhatsApp bot with QR code image",
   "main": "whatsapp-bot.js",
   "scripts": {
     "start": "node whatsapp-bot.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
   "dependencies": {
-    "qrcode-terminal": "^0.12.0",
-    "whatsapp-web.js": "^1.30.0"
+    "whatsapp-web.js": "^1.23.0",
+    "express": "^4.18.2",
+    "qr-image": "^3.2.0"
   }
 }
