@@ -13,22 +13,24 @@ const MAX_PENDING_DOCUMENTS = 10; // Max 10 documents queued per user
 const REASON_TIMEOUT = 10 * 1000; // 10 seconds timeout for reason prompt
 
 const whatsapp = new Client({
-    authStrategy: new LocalAuth(),
+    authStrategy: new LocalAuth({ dataPath: '/app/.wwebjs_auth' }), // For Render persistent disk
     puppeteer: {
-        headless: true, // Ensure headless mode
+        headless: true,
         executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || '/usr/bin/chromium',
         args: [
-            '--no-sandbox', // Required for Render
+            '--no-sandbox',
             '--disable-setuid-sandbox',
             '--disable-dev-shm-usage',
             '--disable-accelerated-2d-canvas',
-            '--disable-gpu', // Disable GPU to avoid graphical dependencies
-            '--no-zygote', // Improve stability in containers
-            '--single-process', // Reduce resource usage
-            '--disable-features=TranslateUI', // Disable unnecessary features
+            '--disable-gpu',
+            '--no-zygote',
+            // Remove --single-process to avoid potential instability
+            '--disable-features=TranslateUI',
             '--no-first-run',
             '--disable-extensions',
+            '--disable-dbus',
         ],
+        timeout: 60000, // 60 seconds for browser initialization
     }
 });
 
@@ -38,8 +40,16 @@ whatsapp.on('qr', async (qr) => {
     app.get('/', (req, res) => res.send(`<img src="${qrImage}" />`));
 });
 
-whatsapp.on('ready', () => {
+whatsapp.on('ready', async () => {
     console.log('WhatsApp bot is ready!');
+    // Ensure page is fully loaded
+    const page = await whatsapp.puppeteerPage;
+    try {
+        await page.waitForNavigation({ waitUntil: 'networkidle0', timeout: 60000 });
+        console.log('Page fully loaded');
+    } catch (err) {
+        console.error('Navigation wait failed:', err);
+    }
 });
 
 whatsapp.on('auth_failure', (msg) => {
@@ -237,9 +247,15 @@ whatsapp.on('message', async (message) => {
     }
 });
 
-// Add error handling and delay for initialization
-whatsapp.initialize().catch((error) => {
-    console.error('Failed to initialize WhatsApp:', error);
-});
+// Handle initialization with retry logic
+whatsapp.initialize()
+    .then(() => console.log('WhatsApp initialization started'))
+    .catch((error) => {
+        console.error('Failed to initialize WhatsApp:', error);
+        setTimeout(() => {
+            console.log('Retrying WhatsApp initialization...');
+            whatsapp.initialize().catch((err) => console.error('Retry failed:', err));
+        }, 5000); // Retry after 5 seconds
+    });
 
 app.listen(3000, '0.0.0.0', () => console.log('Server running on port 3000'));
