@@ -50,12 +50,23 @@ client.on('ready', () => {
 
 // Handle incoming messages
 client.on('message', async message => {
-    console.log('Received message:', message.body);
-    const text = message.body.toLowerCase();
-    if (text === 'hi' || text === 'hello' || text === 'hay' || text === 'hey' || text === 'hii') {
-        console.log('Sending reply to:', message.from);
-        await message.reply('Hi there! How can I Help you');
-    }
+    let chat;
+    try {
+        // Log message details
+        chat = await message.getChat();
+
+        // Ignore group messages
+        if (chat.isGroup) {
+            console.log(`Ignoring message from group chat: ${chat.id._serialized}`);
+            return;
+        }
+        
+        console.log(`Message received from ${message.from}: ${message.body}`);
+        const text = message.body.toLowerCase();
+        if (text === 'hi' || text === 'hello' || text === 'hay' || text === 'hey' || text === 'hii') {
+            console.log('Sending reply to:', message.from);
+            await message.reply('Hi there! How can I Help you');
+        }
 });
 
 // Start Express server
