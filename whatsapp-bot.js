@@ -19,6 +19,7 @@ const client = new Client({
 
 // Generate and save QR code as an image
 client.on('qr', qr => {
+    console.log('QR code string:', qr);
     console.log('QR code generated. Access it at http://<your-render-url>/qr');
     const qrPng = qrImage.image(qr, { type: 'png' });
     qrPng.pipe(fs.createWriteStream(qrFilePath));
@@ -49,8 +50,10 @@ client.on('ready', () => {
 
 // Handle incoming messages
 client.on('message', async message => {
+    console.log('Received message:', message.body);
     const text = message.body.toLowerCase();
     if (text === 'hello') {
+        console.log('Sending reply to:', message.from);
         await message.reply('Hi there! How can I assist you today?');
     }
 });
