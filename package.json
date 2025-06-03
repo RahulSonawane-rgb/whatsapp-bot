@@ -1,16 +1,17 @@
 {
-  "name": "whatsapp-bot",
+  "name": "whatsapp-test",
   "version": "1.0.0",
-  "description": "A simple WhatsApp bot using whatsapp-web.js",
+  "description": "A simple WhatsApp bot",
   "main": "whatsapp-bot.js",
   "scripts": {
     "start": "node whatsapp-bot.js"
   },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
   "dependencies": {
-    "whatsapp-web.js": "^1.23.0",
-    "qrcode-terminal": "^0.12.0"
-  },
-  "engines": {
-    "node": ">=16"
+    "qrcode-terminal": "^0.12.0",
+    "whatsapp-web.js": "^1.30.0"
   }
 }

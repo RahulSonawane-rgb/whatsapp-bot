@@ -20,7 +20,6 @@ client.on('ready', () => {
 
 client.on('message', async message => {
     const text = message.body.toLowerCase();
-    console.log(text);
     if (text === 'hello') {
         await message.reply('Hi there! How can I assist you today?');
     }
