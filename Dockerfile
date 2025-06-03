@@ -1,5 +1,8 @@
 FROM node:18
 
+# Update npm to the latest version
+RUN npm install -g npm@11.4.1
+
 # Install dependencies for Puppeteer/Chromium
 RUN apt-get update && apt-get install -y \
     chromium \
@@ -28,9 +31,6 @@ RUN apt-get update && apt-get install -y \
     --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
-# Set DNS to Google to avoid resolution issues
-RUN echo "nameserver 8.8.8.8" > /etc/resolv.conf
-
 # Set Puppeteer to skip downloading Chromium
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
     PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
@@ -42,7 +42,7 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 
 # Install dependencies
-RUN npm install -y
+RUN npm install
 
 # Copy application code
 COPY . .

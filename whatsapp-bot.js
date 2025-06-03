@@ -1,5 +1,5 @@
-const qrcode = require('qrcode');
 const { Client, LocalAuth } = require('whatsapp-web.js');
+const qrcode = require('qrcode');
 const express = require('express');
 const app = express();
 const http = require('http');
@@ -17,7 +17,7 @@ const messageContext = new Map();
 const reasonTimeouts = new Map(); // Track timeouts per user
 
 const whatsapp = new Client({
-    authStrategy: new LocalAuth({ dataPath: '/app/.wwebjs_auth' }), // For persistent auth on Render
+    authStrategy: new LocalAuth({ dataPath: '/app/.wwebjs_auth' }), // Persistent auth for Render
     puppeteer: {
         headless: true,
         executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || '/usr/bin/chromium',
@@ -28,14 +28,12 @@ const whatsapp = new Client({
             '--disable-accelerated-2d-canvas',
             '--disable-gpu',
             '--no-zygote',
-            '--single-process', // Use with caution, test without if issues persist
             '--disable-features=TranslateUI',
             '--no-first-run',
             '--disable-extensions',
-            '--disable-dbus',
+            '--disable-dbus'
         ],
-        // Add timeout to give browser more time to initialize
-        timeout: 60000, // 60 seconds
+        timeout: 120000 // Increased to 120 seconds for stability
     }
 });
 
@@ -45,8 +43,15 @@ whatsapp.on('qr', async (qr) => {
     app.get('/', (req, res) => res.send(`<img src="${qrImage}" />`));
 });
 
-whatsapp.on('ready', () => {
+whatsapp.on('ready', async () => {
     console.log('WhatsApp bot is ready!');
+    const page = await whatsapp.puppeteerPage;
+    try {
+        await page.waitForNavigation({ waitUntil: 'networkidle0', timeout: 60000 });
+        console.log('Page fully loaded');
+    } catch (err) {
+        console.error('Navigation wait failed:', err);
+    }
 });
 
 whatsapp.on('auth_failure', (msg) => {
@@ -244,12 +249,10 @@ whatsapp.on('message', async (message) => {
     }
 });
 
-// Add error handling and delay for initialization
 whatsapp.initialize()
     .then(() => console.log('WhatsApp initialization started'))
     .catch((error) => {
         console.error('Failed to initialize WhatsApp:', error);
-        // Retry initialization after a delay
         setTimeout(() => {
             console.log('Retrying WhatsApp initialization...');
             whatsapp.initialize().catch((err) => console.error('Retry failed:', err));
