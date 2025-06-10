@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyber Cafe</title>
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="header-container">
+            <div class="logo" onclick="window.location.href='./CyberWebpage.html'">Cyber Cafe</div>
+            <button class="nav-toggle" id="menu-toggle">☰</button>
+            <nav id="nav-links">
+                <ul>
+                    <li><a href="#services">Services</a></li>
+                    <li><a href="#track-work">Track Work</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                    <li><a href="https://wa.me/message/NDUC6ERGAQF4G1?text=Hello" style="background-color: white; color: #2563eb; border-radius: 0.25rem; padding: 0.5rem 1rem;">Chat with Bot</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <h2>All Cyber Cafe Services in One Place</h2>
+        <p>Apply for documents, certificates, and government services online or via WhatsApp. Track your work status anytime on our website or through our WhatsApp bot.</p>
+        <div class="cta-buttons">
+            <a href="#services" class="btn btn-primary">View Services</a>
+            <a href="#track-work" class="btn btn-secondary">Track Your Work</a>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section class="section" id="services">
+        <h2 class="section-title">Our Services</h2>
+        <div id="services-list" class="services-grid">
+            <p>Loading services...</p>
+        </div>
+    </section>
+
+    <!-- Track Work Section -->
+    <section class="section" id="track-work">
+        <h2 class="section-title">Track Your Work</h2>
+        <div class="track-section">
+            <div class="track-methods">
+                <div class="track-method">
+                    <h3>Via WhatsApp</h3>
+                    <div class="whatsapp-info" id="Bot-info-section">
+                        <ul>
+                            <li>
+                                <span class="emojis">🔎</span>
+                                <div>
+                                    <strong>Track by Order ID:</strong> <br>
+                                    Send <span id="documentName">"document status"</span> to <a href="https://wa.me/918275145153?text=document%20status" target="_blank" id="whatsappNumber">+91 8275145153</a> and enter your Order ID on WhatsApp to see your order progress.
+                                </div>
+                            </li>
+                            <li>
+                                <span class="emojis">📝</span>
+                                <div>
+                                    <strong>Submit New Requests:</strong> <br>
+                                    Start a new work request directly on WhatsApp! The bot will guide you step-by-step and collect your details &amp; documents.
+                                </div>
+                            </li>
+                            <li>
+                                <span class="emojis">🤝</span>
+                                <div>
+                                    <strong>Need Help?</strong> <br>
+                                    Chat with our WhatsApp bot for instant answers, document info, or to connect with our staff for personal assistance.
+                                </div>
+                            </li>
+                        </ul>
+                        <div >
+                            <a href="https://wa.me/message/NDUC6ERGAQF4G1?text=Hello" target="_blank" class="whatsapp-btn">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp" style="width: 1.5rem; height: 1.5rem;">
+                                Start WhatsApp Chat
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="track-method">
+                    <h3>Online Tracking</h3>
+                    <form id="track-form" class="track-form">
+                        <div class="form-group">
+                            <label for="order-id">Order ID</label>
+                            <input type="text" id="order-id" class="form-group input" placeholder="Enter your Order ID" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone-number">Phone Number (Without +91)</label>
+                            <input type="text" id="phone-number" class="form-group input" placeholder="Enter your Phone Number" maxlength="10" pattern="[0-9]{10}" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Track</button>
+                    </form>
+                    <div id="track-result" class="text-left"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="section" id="contact">
+        <h2 class="section-title">Contact Us</h2>
+        <div class="contact-container">
+            <div class="contact-grid">
+                <div class="contact-info">
+                    <h3>Get in Touch</h3>
+                    <p><strong>Address:</strong> 123 Cyber Plaza, Main Road, Pune, Maharashtra</p>
+                    <p><strong>Email:</strong> info@cybercafe.com</p>
+                    <p class="query-text">Have a query? Chat with our WhatsApp bot for instant help!</p>
+                    <a href="https://wa.me/message/NDUC6ERGAQF4G1?text=Hello" target="_blank" class="whatsapp-btn">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp">
+                        Chat on WhatsApp
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-links">
+            <a href="#services">Services</a>
+            <a href="#track-work">Track Work</a>
+            <a href="#contact">Contact</a>
+            <a href="./policy.html">Privacy Policy</a>
+            <a href="./terms.html">Terms of Service</a>
+        </div>
+        <p class="copyright">© 2025 Cyber Cafe Services. All rights reserved.</p>
+    </footer>
+
+    <!-- Service Details Modal -->
+    <div id="service-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="service-title">Service Details</h3>
+                <button class="modal-close" onclick="closeModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <h4 style="font-weight: 600; margin-bottom: 1rem; transition: all 0.3s ease;">Required Documents:</h4>
+                <p id="service-documents" style="margin-bottom: 1.5rem; transition: all 0.3s ease;"><strong>Required Documents:</strong></p>
+                <h4 style="font-weight: 600; margin-bottom: 1rem; transition: all 0.3s ease;">Charges:</h4>
+                <p id="service-charges" style="margin-bottom: 1.5rem; transition: all 0.3s ease;"><strong>Charges:</strong></p>
+                <a href="#apply" class="btn btn-primary">Apply for this Service</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Apply for Service Modal -->
+    <div id="apply-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Apply for Service</h3>
+                <button class="modal-close" onclick="closeModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <form id="apply-form" class="track-form" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="apply-name">Your Name</label>
+                        <input type="text" id="apply-name" name="name" class="form-group input" placeholder="Enter your Name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="apply-phone">Phone Number (Without +91)</label>
+                        <input type="tel" id="apply-phone" name="phone" class="form-group input" placeholder="Enter your Phone Number" maxlength="10" pattern="[0-9]{10}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="apply-reason">Service</label>
+                        <input type="text" id="apply-reason" name="reason" class="form-group input" placeholder="Enter service name" required readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="apply-files">Upload Documents</label>
+                        <input type="file" id="apply-files" name="documents" class="form-group input" multiple accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" required>
+                        <p style="font-size: 0.875rem; color: #64748b; transition: all 0.3s ease;">(PDF, JPG, PNG, DOC, DOCX up to 10MB each)</p>
+                    </div>
+                    <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+                        <button type="button" class="btn btn-outline cancel">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Submit Application</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Work Status Modal -->
+    <div id="status-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Your Work Status</h3>
+                <button class="modal-close" onclick="closeModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <div id="status-content" class="text-left"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="./script.js"></script>
+</body>
+</html>
