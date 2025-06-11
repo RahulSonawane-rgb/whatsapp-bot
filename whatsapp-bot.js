@@ -881,7 +881,8 @@ async function handleOwnerUpdateStatus(message, userContext) {
         }
 
         const orderId = parts[1].trim();
-        const newStatus = parts.slice(2).join(' ').trim();
+        const tempStatus = parts.slice(2).join(' ').trim();
+        const newStatus = tempStatus.toLowerCase();
 
         if (orderId === '' || newStatus === '') {
             await whatsapp.sendMessage(OWNER_NUMBER, `ऑर्डर आयडी आणि नवीन स्थिती आवश्यक आहे. उदाहरण: *status WO-123456 Payment Pending*`);
@@ -908,7 +909,7 @@ async function handleOwnerUpdateStatus(message, userContext) {
                         // Update status to "Completed" consistently
                         db.run(
                             `UPDATE work_orders SET status = ?, lastUpdated = ?, notes = ? WHERE orderId = ?`,
-                            ['Completed', new Date().toISOString(), 'काम पूर्ण झाले आहे.', orderId],
+                            ['completed', new Date().toISOString(), 'काम पूर्ण झाले आहे.', orderId],
                             async function(updateErr) {
                                 if (updateErr) {
                                     console.error("Error updating order status to completed:", updateErr.message);
