@@ -17,7 +17,7 @@ const PORT = process.env.PORT || 3000; // Use environment port or default to 300
 const SUPPORTED_DOCUMENT_TYPES = ['application/pdf', 'image/jpeg', 'image/png', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
 const MAX_DOCUMENT_SIZE = 10 * 1024 * 1024; // 10 MB
 const MAX_PENDING_DOCUMENTS = 10; // Max 10 documents queued per user
-const REASON_TIMEOUT = 15 * 1000; // 15 seconds timeout for reason prompt
+const REASON_TIMEOUT = 20 * 1000; // 15 seconds timeout for reason prompt
 const OWNER_DOCUMENT_TIMEOUT = 5 * 60 * 1000; // 5 minutes timeout for owner document
 
 // Use a temporary directory for document storage
@@ -71,6 +71,15 @@ const services = {
 
 // Service Aliases (unchanged)
 const serviceAliases = {
+    '1': 'पॅन कार्ड (नवीन/दुरुस्ती)',
+    '2': 'मतदान कार्ड (नवीन/दुरुस्ती)',
+    '3': 'पोलिस मंजुरी प्रमाणपत्र (PCC)',
+    '4': 'उत्पन्नाचा दाखला',
+    '5': 'डोमिसाईल / नॅशनलिटी दाखला',
+    '6': 'नॉन क्रिमीलेयर दाखला',
+    '7': 'जातिचा दाखला',
+    '8': 'केंद्र शासन जातिचा दाखला',
+    '9': 'आर्थिकदृष्ट्या दुर्बल प्रमाणपत्र (EWS)',
     'income certificate': 'उत्पन्नाचा दाखला',
     'income certi': 'उत्पन्नाचा दाखला',
     'utpannacha dakhala': 'उत्पन्नाचा दाखला',
@@ -110,6 +119,8 @@ const serviceAliases = {
     'voter id': 'मतदान कार्ड (नवीन/दुरुस्ती)',
     'election card': 'मतदान कार्ड (नवीन/दुरुस्ती)',
     'matdar card': 'मतदान कार्ड (नवीन/दुरुस्ती)',
+    'matdan card': 'मतदान कार्ड (नवीन/दुरुस्ती)',
+    'matdan': 'मतदान कार्ड (नवीन/दुरुस्ती)',
     'voting card': 'मतदान कार्ड (नवीन/दुरुस्ती)',
     'police clearance': 'पोलिस मंजुरी प्रमाणपत्र (PCC)',
     'pcc': 'पोलिस मंजुरी प्रमाणपत्र (PCC)',
@@ -272,7 +283,7 @@ let responseFooter;
 // HTTP Server for QR Code and API
 const server = http.createServer(app);
 server.listen(PORT, () => {
-    console.log(`Server started at port https://localhost:${PORT}`);
+    console.log(`Server started at http://localhost:${PORT}`); // Updated to reflect HTTP
 });
 
 const upload = multer({
@@ -445,8 +456,8 @@ async function handleAIResponse(message, userMessage) {
 // Command Handlers (unchanged)
 async function handleGreeting(message, userContext) {
     try {
-        const serviceList = Object.keys(services).map(name => `\n- ${name}`).join('');
-        const greeting = `🟢 नमस्कार! मी तुमचा WhatsApp सहाय्यक बोट आहे.\n\nमी तुमचं स्वागत करतोय! खाली दिलेली सेवा मी सध्या देऊ शकतो:\n\n🗂️ सेवांची यादी:\n${serviceList}\n\nकृपया तुमची सेवा निवडा किंवा आपला प्रश्न विचारा.${responseFooter}`;
+        const serviceList = Object.keys(services).map((name, index) => `\n${index + 1}. ${name}`).join('');
+        const greeting = `🟢 नमस्कार! मी तुमचा WhatsApp सहाय्यक बोट आहे.\n\nमी तुमचं स्वागत करतोय! खाली दिलेली सेवा मी सध्या देऊ शकतो:\n\n🗂️ सेवांची यादी:\n${serviceList}\n\nकृपया तुमची सेवा निवडा (नाव किंवा क्रमांक टाइप करा) किंवा आपला प्रश्न विचारा.${responseFooter}`;
         await whatsapp.sendMessage(message.from, greeting);
         messageContext.delete(message.from);
         clearUserTimeout(message.from);
@@ -460,8 +471,8 @@ async function handleGreeting(message, userContext) {
 
 async function handleServiceList(message, userContext) {
     try {
-        const serviceList = Object.keys(services).map(name => `\n- ${name}`).join('');
-        const response = `खालील सेवांची यादी उपलब्ध आहे:\n${serviceList}\n\nकृपया तुमची सेवा निवडा किंवा तुमचा प्रश्न विचारा.`;
+        const serviceList = Object.keys(services).map((name, index) => `\n${index + 1}. ${name}`).join('');
+        const response = `खालील सेवांची यादी उपलब्ध आहे:\n${serviceList}\n\nकृपया तुमची सेवा निवडा (नाव किंवा क्रमांक टाइप करा) किंवा तुमचा प्रश्न विचारा.`;
         await whatsapp.sendMessage(message.from, response);
         console.log('Service list sent to', message.from);
     } catch (error) {
@@ -1424,8 +1435,15 @@ whatsapp.on('message', async (message) => {
             await handleCheckStatus(message, userContext);
         } else if (messageBody === 'माझे काम' || messageBody === 'my works list' || messageBody === 'work list') {
             await getWorkList(message, userContext);
-        } else if (services[originalMessage] || serviceAliases[normalizedInput]) {
-            const serviceName = services[originalMessage] ? originalMessage : serviceAliases[normalizedInput];
+        } else if (services[originalMessage] || serviceAliases[normalizedInput] || serviceNumberMap[normalizedInput]) {
+            let serviceName;
+            if (services[originalMessage]) {
+                serviceName = originalMessage;
+            } else if (serviceAliases[normalizedInput]) {
+                serviceName = serviceAliases[normalizedInput];
+            } else if (serviceNumberMap[normalizedInput]) {
+                serviceName = serviceNumberMap[normalizedInput];
+            }
             await handleDocumentsRequest(message, userContext, serviceName);
             console.log(`Matched service ${serviceName} for input: ${originalMessage}`);
         } else if (message.hasMedia) {

@@ -109,56 +109,66 @@
     });
 
     // Apply Form Submission
-    document.getElementById('apply-form').addEventListener('submit', (event) => {
-        event.preventDefault();
-        const form = event.target;
-        const formData = new FormData(form);
-        const files = document.getElementById('apply-files').files;
-        const applyModal = document.getElementById('apply-modal');
-        const statusModal = document.getElementById('status-modal');
-        const statusContent = document.getElementById('status-content');
+document.getElementById('apply-form').addEventListener('submit', (event) => {
+    event.preventDefault();
+    const form = event.target;
+    const formData = new FormData(form);
+    const files = document.getElementById('apply-files').files;
+    const applyModal = document.getElementById('apply-modal');
+    const statusModal = document.getElementById('status-modal');
+    const statusContent = document.getElementById('status-content');
+    const loadingOverlay = document.getElementById('loading-overlay'); // Reference loading overlay
 
-        // Client-side validation
-        if (files.length === 0) {
-            statusContent.innerHTML = '<p class="text-red-500">Please upload at least one document.</p>';
+    // Client-side validation
+    if (files.length === 0) {
+        statusContent.innerHTML = '<p class="text-red-500">Please upload at least one document.</p>';
+        statusModal.style.display = 'flex';
+        return;
+    }
+    if (files.length > 10) {
+        statusContent.innerHTML = '<p class="text-red-500">You can upload a maximum of 10 documents.</p>';
+        statusModal.style.display = 'flex';
+        return;
+    }
+    for (let file of files) {
+        if (file.size > 10 * 1024 * 1024) {
+            statusContent.innerHTML = `<p class="text-red-500">File ${file.name} exceeds 10MB limit.</p>`;
             statusModal.style.display = 'flex';
             return;
         }
-        if (files.length > 10) {
-            statusContent.innerHTML = '<p class="text-red-500">You can upload a maximum of 10 documents.</p>';
-            statusModal.style.display = 'flex';
-            return;
-        }
-        for (let file of files) {
-            if (file.size > 10 * 1024 * 1024) {
-                statusContent.innerHTML = `<p class="text-red-500">File ${file.name} exceeds 10MB limit.</p>`;
+    }
+
+    // Show loading overlay
+    loadingOverlay.classList.add('active');
+
+    fetch('/api/apply', {
+        method: 'POST',
+        body: formData
+    })
+        .then(response => response.json())
+        .then(data => {
+            // Hide loading overlay
+            loadingOverlay.classList.remove('active');
+
+            if (data.error) {
+                statusContent.innerHTML = `<p class="text-red-500">${data.error}</p>`;
                 statusModal.style.display = 'flex';
-                return;
+            } else {
+                statusContent.innerHTML = `
+                    <p class="text-green-500">${data.message}</p>
+                    <p><strong>Order ID:</strong> ${data.orderId}</p>
+                `;
+                statusModal.style.display = 'flex';
+                form.reset();
+                applyModal.style.display = 'none';
             }
-        }
-
-        fetch('/api/apply', {
-            method: 'POST',
-            body: formData
         })
-            .then(response => response.json())
-            .then(data => {
-                if (data.error) {
-                    statusContent.innerHTML = `<p class="text-red-500">${data.error}</p>`;
-                    statusModal.style.display = 'flex';
-                } else {
-                    statusContent.innerHTML = `
-                        <p class="text-green-500">${data.message}</p>
-                        <p><strong>Order ID:</strong> ${data.orderId}</p>
-                    `;
-                    statusModal.style.display = 'flex';
-                    form.reset();
-                    applyModal.style.display = 'none';
-                }
-            })
-            .catch(error => {
-                console.error('Error submitting application:', error);
-                statusContent.innerHTML = '<p class="text-red-500">Error submitting application. Please try again later.</p>';
-                statusModal.style.display = 'flex';
-            });
+        .catch(error => {
+            // Hide loading overlay
+            loadingOverlay.classList.remove('active');
+
+            console.error('Error submitting application:', error);
+            statusContent.innerHTML = '<p class="text-red-500">Error submitting application. Please try again later.</p>';
+            statusModal.style.display = 'flex';
+        });
     });

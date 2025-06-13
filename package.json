@@ -6,6 +6,8 @@
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
+    "http": "^0.0.1-security",
+    "https": "^1.0.0",
     "multer": "^2.0.1",
     "mysql2": "^3.14.1",
     "puppeteer": "^24.10.0",
@@ -24,7 +26,7 @@
     }
   },
   "scripts": {
-    "start": "node TwilioWhatsapp.js"
+    "start": "node whatsapp-bot.js"
   },
   "description": "A WhatsApp bot for handling document uploads and forwarding them to an owner for cyber cafe services.",
   "main": "whatsapp-bot.js",
