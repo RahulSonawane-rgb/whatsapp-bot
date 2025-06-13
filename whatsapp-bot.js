@@ -283,7 +283,11 @@ let responseFooter;
 // HTTP Server for QR Code and API
 const server = http.createServer(app);
 server.listen(PORT, () => {
+<<<<<<< HEAD
     console.log(`Server started at http://localhost:${PORT}`); // Updated to reflect HTTP
+=======
+    console.log(`Server started at port http://localhost:${PORT}`);
+>>>>>>> f539f073a2aaea7510e2a66cf511bc41b0329bfc
 });
 
 const upload = multer({
